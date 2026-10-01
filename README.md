@@ -1,4 +1,5 @@
 # Docket
+<<<<<<< HEAD
 
 One list for everything you need to get done, pulled from the apps you already use.
 
@@ -55,3 +56,6 @@ Every request except `/health` needs `Authorization: Bearer <Supabase access tok
 | POST | `/sync` | | Sync all of the current user's accounts now |
 
 The server also syncs every account in the background every `SYNC_INTERVAL_MINUTES`.
+=======
+Organization + To Do List App 
+>>>>>>> d458c7300a0e015dec214cf35f1a6031cb2956a6
