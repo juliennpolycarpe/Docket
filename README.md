@@ -26,7 +26,7 @@ does everything that needs a secret: storing connected-account tokens
 ### 1. Supabase
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor**, paste in `supabase/migrations/20260930000000_init.sql`, and run it.
+2. Connect this GitHub repo under **Project Settings > Integrations > GitHub** (working directory `.`, production branch `main`). Supabase then applies everything in `supabase/migrations/` on each push to `main`. Don't also paste migrations into the SQL Editor, or the automatic run will fail on tables that already exist.
 3. **Authentication > Sign In / Providers**: Email is on by default. Google sign-in can be added later.
 
 ### 2. Server
