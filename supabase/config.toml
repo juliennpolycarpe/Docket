@@ -1,0 +1,3 @@
+# Supabase CLI / GitHub integration settings.
+# Migrations in supabase/migrations/ are applied to production on push to main.
+project_id = "docket"
