@@ -1,5 +1,4 @@
 # Docket
-<<<<<<< HEAD
 
 One list for everything you need to get done, pulled from the apps you already use.
 
@@ -27,7 +26,7 @@ does everything that needs a secret: storing connected-account tokens
 ### 1. Supabase
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor**, paste in `supabase/migrations/0001_init.sql`, and run it.
+2. Open **SQL Editor**, paste in `supabase/migrations/20260930000000_init.sql`, and run it.
 3. **Authentication > Sign In / Providers**: Email is on by default. Google sign-in can be added later.
 
 ### 2. Server
@@ -56,6 +55,3 @@ Every request except `/health` needs `Authorization: Bearer <Supabase access tok
 | POST | `/sync` | | Sync all of the current user's accounts now |
 
 The server also syncs every account in the background every `SYNC_INTERVAL_MINUTES`.
-=======
-Organization + To Do List App 
->>>>>>> d458c7300a0e015dec214cf35f1a6031cb2956a6
