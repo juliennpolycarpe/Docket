@@ -11,7 +11,7 @@ One list for everything you need to get done, pulled from the apps you already u
 ## Layout
 
 ```
-app/        Flutter app (Windows, macOS, iOS, Android) - not created yet
+app/        Flutter app (Windows, macOS, iOS, Android)
 server/     TypeScript server: connected accounts, syncing, email triage
 supabase/   Database schema (Postgres + login, hosted by Supabase)
 ```
@@ -42,6 +42,20 @@ npm run dev
 Fill in `SUPABASE_URL` and `SUPABASE_SECRET_KEY` from **Project Settings > API Keys**.
 
 Other commands: `npm test`, `npm run typecheck`, `npm run build && npm start`.
+
+### 3. App
+
+Windows builds need Visual Studio with the **Desktop development with C++** workload, and
+Windows **Developer Mode** turned on (Settings > System > For developers). `flutter doctor` checks both.
+
+```bash
+cd app
+cp config.example.json config.json   # fill in the Supabase URL and publishable key
+flutter run -d windows --dart-define-from-file=config.json
+```
+
+The server must be running for connecting accounts and pull-to-refresh. Everything else
+(login, tasks) talks to Supabase directly.
 
 ## Server API
 

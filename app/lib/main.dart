@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
-import 'screens/home_screen.dart';
+import 'screens/app_shell.dart';
 import 'screens/login_screen.dart';
 
 Future<void> main() async {
@@ -46,7 +46,7 @@ class _AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<AuthState>(
       stream: supabase.auth.onAuthStateChange,
-      builder: (context, _) => supabase.auth.currentSession == null ? const LoginScreen() : const HomeScreen(),
+      builder: (context, _) => supabase.auth.currentSession == null ? const LoginScreen() : const AppShell(),
     );
   }
 }

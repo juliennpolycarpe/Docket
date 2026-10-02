@@ -6,3 +6,6 @@ dist/
 # Flutter
 .dart_tool/
 build/
+
+# Visual Studio cache
+.vs/
