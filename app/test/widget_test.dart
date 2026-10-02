@@ -1,39 +1,47 @@
+import 'package:docket/format.dart';
+import 'package:docket/greeting.dart';
+import 'package:docket/models/event.dart';
+import 'package:docket/models/priority.dart';
 import 'package:docket/models/task.dart';
-import 'package:docket/screens/todo_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-Task _task(String title, {DateTime? due, bool completed = false, bool submitted = false}) =>
-    Task(id: title, source: 'manual', title: title, dueAt: due, completed: completed, submitted: submitted);
 
 void main() {
   final now = DateTime(2026, 10, 1, 12); // Thursday noon
 
-  test('groupTasks puts tasks in the right sections', () {
-    final groups = groupTasks([
-      _task('overdue', due: DateTime(2026, 9, 30, 23, 59)),
-      _task('tonight', due: DateTime(2026, 10, 1, 23, 59)),
-      _task('monday', due: DateTime(2026, 10, 5, 9)),
-      _task('next month', due: DateTime(2026, 11, 2)),
-      _task('someday'),
-      _task('checked off', due: DateTime(2026, 10, 2), completed: true),
-      _task('submitted', due: DateTime(2026, 9, 1), submitted: true),
-    ], now);
-
-    List<String> titles(TaskSection s) => groups[s]!.map((t) => t.title).toList();
-    expect(titles(TaskSection.overdue), ['overdue']);
-    expect(titles(TaskSection.today), ['tonight']);
-    expect(titles(TaskSection.thisWeek), ['monday']);
-    expect(titles(TaskSection.later), ['next month']);
-    expect(titles(TaskSection.noDate), ['someday']);
-    expect(titles(TaskSection.done), ['checked off', 'submitted']);
+  test('tasks get an automatic priority from their due date', () {
+    expect(autoTaskPriority(DateTime(2026, 9, 30), now), Priority.high, reason: 'overdue');
+    expect(autoTaskPriority(DateTime(2026, 10, 3, 11), now), Priority.high, reason: 'within 2 days');
+    expect(autoTaskPriority(DateTime(2026, 10, 6), now), Priority.medium, reason: 'within a week');
+    expect(autoTaskPriority(DateTime(2026, 10, 20), now), Priority.low);
+    expect(autoTaskPriority(null, now), Priority.low);
   });
 
-  test('sections are sorted soonest first', () {
-    final groups = groupTasks([
-      _task('b', due: DateTime(2026, 10, 4)),
-      _task('a', due: DateTime(2026, 10, 3)),
-    ], now);
-    expect(groups[TaskSection.thisWeek]!.map((t) => t.title), ['a', 'b']);
+  test('a priority you set wins over the automatic one', () {
+    final task = Task(id: '1', source: 'manual', title: 'x', dueAt: DateTime(2026, 9, 30), priority: Priority.low);
+    expect(task.effectivePriority(now), Priority.low);
+  });
+
+  test('events get an automatic priority from their start', () {
+    expect(autoEventPriority(DateTime(2026, 10, 2, 23), now), Priority.high, reason: 'tomorrow');
+    expect(autoEventPriority(DateTime(2026, 10, 7), now), Priority.medium);
+    expect(autoEventPriority(DateTime(2026, 11, 1), now), Priority.low);
+  });
+
+  test('events stay upcoming until they end', () {
+    Event event({required DateTime start, DateTime? end, bool allDay = false}) =>
+        Event(id: '1', title: 'x', startsAt: start, endsAt: end, allDay: allDay);
+    expect(event(start: DateTime(2026, 10, 1, 11), end: DateTime(2026, 10, 1, 13)).isUpcoming(now), isTrue);
+    expect(event(start: DateTime(2026, 10, 1, 9), end: DateTime(2026, 10, 1, 10)).isUpcoming(now), isFalse);
+    expect(event(start: DateTime(2026, 10, 1), allDay: true).isUpcoming(now), isTrue);
+    expect(event(start: DateTime(2026, 9, 30), allDay: true).isUpcoming(now), isFalse);
+  });
+
+  test('greeting depends on the time of day and includes the name', () {
+    expect(greeting(DateTime(2026, 10, 1, 1), 'Julien'), endsWith(', Julien?'));
+    expect(greeting(DateTime(2026, 10, 1, 9), 'Julien'), contains('Julien'));
+    expect(greeting(DateTime(2026, 10, 1, 9), null), isNot(contains(',')));
+    expect(greeting(DateTime(2026, 10, 1, 2), 'Julien'), greeting(DateTime(2026, 10, 1, 3), 'Julien'),
+        reason: 'stays the same within the same part of the day');
   });
 
   test('formatDue uses friendly day names', () {
