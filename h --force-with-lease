@@ -1,0 +1,18 @@
+2604ba5 edited canvas features, now using calendar feed isntead of API key 
+2b58f00 fixed upcoming events text wrapper, & name highlighting 
+caab002 Feat: sidebar, greeting page, priority boards, settings 
+e29fd11 app functionalities created. 
+8efa3f3 Add Supabase config for GitHub integration; accept SUPABASE_URL with a path 
+f23103e README: database setup goes through the Supabase GitHub integration 
+75e00f2 Fix README merge conflict; use timestamped migration name for Supabase 
+79b4ae2 first iteration 
+4ca8f1b Set up Docket server, database schema, and Canvas sync - Supabase schema for connected accounts, encrypted credentials, tasks,
+  events, and emails, with row-level security so the app only sees the
+  signed-in user's rows
+- Fastify server that verifies Supabase sessions, connects Canvas via a
+  personal access token (stored AES-256-GCM encrypted), and syncs
+  assignments from the Canvas planner into To Do
+- Background sync every SYNC_INTERVAL_MINUTES plus POST /sync on demand
+- Tests for token encryption and Canvas planner item mapping
+
+3d01116 Initial commit 
