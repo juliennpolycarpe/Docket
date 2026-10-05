@@ -1,9 +1,11 @@
 import type { FastifyBaseLogger } from "fastify";
 import { listAccounts, recordSyncResult, type ConnectedAccount, type Provider } from "../accounts.js";
 import { syncCanvas } from "./canvas.js";
+import { syncCanvasFeed } from "./canvasFeed.js";
 
 const syncers: Partial<Record<Provider, (account: ConnectedAccount) => Promise<void>>> = {
   canvas: syncCanvas,
+  canvas_feed: syncCanvasFeed,
 };
 
 export interface SyncResult {

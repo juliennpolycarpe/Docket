@@ -42,10 +42,16 @@ class DocketApi {
     return decoded;
   }
 
-  /// Connects Canvas and runs the first sync. Returns a warning if the account
-  /// was saved but the first sync failed.
-  static Future<String?> connectCanvas({required String baseUrl, required String token}) async {
-    final result = await _send('POST', '/accounts/canvas', {'baseUrl': baseUrl, 'token': token});
+  /// Connects Canvas with an API access token and runs the first sync. Returns
+  /// a warning if the account was saved but the first sync failed.
+  static Future<String?> connectCanvas({required String baseUrl, required String token}) async =>
+      _syncWarning(await _send('POST', '/accounts/canvas', {'baseUrl': baseUrl, 'token': token}));
+
+  /// Connects Canvas with its calendar feed link. Same return value as [connectCanvas].
+  static Future<String?> connectCanvasFeed(String feedUrl) async =>
+      _syncWarning(await _send('POST', '/accounts/canvas-feed', {'feedUrl': feedUrl}));
+
+  static String? _syncWarning(Map<String, dynamic> result) {
     final sync = result['sync'] as Map<String, dynamic>?;
     return sync != null && sync['ok'] == false ? sync['error'] as String? : null;
   }

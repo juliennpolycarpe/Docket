@@ -4,7 +4,7 @@ import { db } from "./db.js";
 
 const key = parseKey(config.TOKEN_ENCRYPTION_KEY);
 
-export type Provider = "canvas" | "google" | "microsoft";
+export type Provider = "canvas" | "canvas_feed" | "google" | "microsoft";
 
 export interface ConnectedAccount {
   id: string;

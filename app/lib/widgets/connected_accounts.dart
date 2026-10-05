@@ -23,8 +23,11 @@ class _ConnectedAccountsState extends State<ConnectedAccounts> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _connectCanvas() async {
-    final connected = await showDialog<_ConnectResult>(context: context, builder: (_) => const _ConnectCanvasDialog());
+  Future<void> _connectCanvas({required bool withFeed}) async {
+    final connected = await showDialog<_ConnectResult>(
+      context: context,
+      builder: (_) => withFeed ? const _ConnectCanvasFeedDialog() : const _ConnectCanvasDialog(),
+    );
     if (connected == null) return;
     _reload();
     _showMessage(connected.syncWarning == null
@@ -87,9 +90,17 @@ class _ConnectedAccountsState extends State<ConnectedAccounts> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.school),
               title: const Text('Connect Canvas'),
-              subtitle: const Text('Assignments go to To Do'),
+              subtitle: const Text('With your calendar feed link. Assignments go to To Do, course events to Upcoming.'),
               trailing: const Icon(Icons.add),
-              onTap: _connectCanvas,
+              onTap: () => _connectCanvas(withFeed: true),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.key_outlined),
+              title: const Text('Connect Canvas with an access token'),
+              subtitle: const Text('Also marks assignments done when you submit them. Some schools turn tokens off.'),
+              trailing: const Icon(Icons.add),
+              onTap: () => _connectCanvas(withFeed: false),
             ),
             const ListTile(
               contentPadding: EdgeInsets.zero,
@@ -121,7 +132,7 @@ class _ConnectedAccountsState extends State<ConnectedAccounts> {
 }
 
 IconData _providerIcon(String provider) => switch (provider) {
-      'canvas' => Icons.school,
+      'canvas' || 'canvas_feed' => Icons.school,
       'microsoft' => Icons.business_center,
       _ => Icons.alternate_email,
     };
@@ -129,6 +140,104 @@ IconData _providerIcon(String provider) => switch (provider) {
 class _ConnectResult {
   _ConnectResult(this.syncWarning);
   final String? syncWarning;
+}
+
+class _ConnectCanvasFeedDialog extends StatefulWidget {
+  const _ConnectCanvasFeedDialog();
+
+  @override
+  State<_ConnectCanvasFeedDialog> createState() => _ConnectCanvasFeedDialogState();
+}
+
+class _ConnectCanvasFeedDialogState extends State<_ConnectCanvasFeedDialog> {
+  final _link = TextEditingController();
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _link.dispose();
+    super.dispose();
+  }
+
+  Future<void> _connect() async {
+    if (_link.text.trim().isEmpty) {
+      setState(() => _error = 'Paste your calendar feed link.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final warning = await DocketApi.connectCanvasFeed(_link.text.trim());
+      if (mounted) Navigator.of(context).pop(_ConnectResult(warning));
+    } on ApiException catch (e) {
+      setState(() {
+        _busy = false;
+        _error = e.message;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    return AlertDialog(
+      title: const Text('Connect Canvas'),
+      content: SizedBox(
+        width: 460,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Docket reads your Canvas calendar through a private link. To find it:', style: muted),
+            const SizedBox(height: 8),
+            for (final (i, step) in const [
+              'Open Canvas in your browser and click Calendar in the left menu.',
+              'At the bottom right, click "Calendar Feed".',
+              'Copy the whole link it shows you and paste it below.',
+            ].indexed)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('${i + 1}.  $step', style: muted),
+              ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _link,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Calendar feed link',
+                hintText: 'https://canvas.yourschool.edu/feeds/calendars/user_...ics',
+              ),
+              keyboardType: TextInputType.url,
+              onSubmitted: (_) => _connect(),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "Keep this link private: anyone who has it can see your Canvas calendar. Docket stores it encrypted. "
+              "Canvas doesn't share what you've submitted through this link, so check things off yourself.",
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: _busy ? null : () => Navigator.of(context).pop(), child: const Text('Cancel')),
+        FilledButton(
+          onPressed: _busy ? null : _connect,
+          child: _busy
+              ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Text('Connect'),
+        ),
+      ],
+    );
+  }
 }
 
 class _ConnectCanvasDialog extends StatefulWidget {
@@ -175,7 +284,7 @@ class _ConnectCanvasDialogState extends State<_ConnectCanvasDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: const Text('Connect Canvas'),
+      title: const Text('Connect Canvas with a token'),
       content: SizedBox(
         width: 420,
         child: Column(
