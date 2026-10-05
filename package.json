@@ -1,0 +1,12 @@
+{
+  "name": "docket",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names server,app --prefix-colors cyan,magenta --kill-others --handle-input --default-input-target app \"npm run dev --prefix server\" \"cd app && flutter run -d windows --dart-define-from-file=config.json\"",
+    "server": "npm run dev --prefix server",
+    "app": "cd app && flutter run -d windows --dart-define-from-file=config.json"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

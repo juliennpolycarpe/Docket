@@ -233,15 +233,24 @@ class _SummaryBox extends StatelessWidget {
                   children: [
                     Icon(icon, size: 20, color: scheme.primary),
                     const SizedBox(width: 8),
-                    Flexible(child: Text(title, style: theme.textTheme.titleMedium, overflow: TextOverflow.ellipsis)),
-                    const SizedBox(width: 8),
-                    if (total > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: scheme.secondaryContainer, borderRadius: BorderRadius.circular(10)),
-                        child: Text('$total', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSecondaryContainer)),
+                    // Title and count take all the room up to the arrow; the title only
+                    // gets shortened if that room genuinely runs out.
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(child: Text(title, style: theme.textTheme.titleMedium, overflow: TextOverflow.ellipsis)),
+                          if (total > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(color: scheme.secondaryContainer, borderRadius: BorderRadius.circular(10)),
+                              child: Text('$total', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSecondaryContainer)),
+                            ),
+                          ],
+                        ],
                       ),
-                    const Spacer(),
+                    ),
+                    const SizedBox(width: 8),
                     Icon(Icons.arrow_forward, size: 18, color: scheme.onSurfaceVariant),
                   ],
                 ),

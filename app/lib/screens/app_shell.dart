@@ -115,13 +115,16 @@ class _AppShellState extends State<AppShell> {
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
               width: width,
-              color: scheme.surfaceContainerLow,
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  minWidth: width,
-                  maxWidth: width,
-                  child: _sidebar(collapsed: _collapsed, canCollapse: true),
+              // A Material (not a plain color) so hover highlights inside the sidebar show up.
+              child: Material(
+                color: scheme.surfaceContainerLow,
+                child: ClipRect(
+                  child: OverflowBox(
+                    alignment: Alignment.topLeft,
+                    minWidth: width,
+                    maxWidth: width,
+                    child: _sidebar(collapsed: _collapsed, canCollapse: true),
+                  ),
                 ),
               ),
             ),

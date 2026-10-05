@@ -21,6 +21,18 @@ the database (row-level security keeps each user to their own rows). The server
 does everything that needs a secret: storing connected-account tokens
 (encrypted), syncing Canvas/Google/Microsoft, and calling Claude.
 
+## Running
+
+From the project root, start the server and the Windows app together:
+
+```bash
+npm install    # first time only
+npm run dev
+```
+
+Keys you type go to the app, so `r` (hot reload) and `q` (quit) still work. Quitting the
+app stops the server too. `npm run server` / `npm run app` start just one.
+
 ## Setup
 
 ### 1. Supabase
